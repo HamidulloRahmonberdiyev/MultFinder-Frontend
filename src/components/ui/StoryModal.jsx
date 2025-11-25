@@ -1,6 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 
-const StoryModal = ({ story, onClose }) => {
+const StoryModal = ({ story, onClose, onLike, isLiked }) => {
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
@@ -17,6 +17,38 @@ const StoryModal = ({ story, onClose }) => {
     window.addEventListener("keydown", handleEscape);
     return () => window.removeEventListener("keydown", handleEscape);
   }, [onClose]);
+
+  const liked = isLiked?.(story.id) ?? false;
+  const [showHeart, setShowHeart] = useState(false);
+  const heartTimeoutRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (heartTimeoutRef.current) {
+        clearTimeout(heartTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const triggerHeartAnimation = () => {
+    setShowHeart(true);
+    if (heartTimeoutRef.current) {
+      clearTimeout(heartTimeoutRef.current);
+    }
+    heartTimeoutRef.current = setTimeout(() => setShowHeart(false), 650);
+  };
+
+  const handleLike = () => {
+    triggerHeartAnimation();
+    if (!story?.id || !onLike) return;
+    if (liked) return;
+    onLike(story.id);
+  };
+
+  const handleButtonLike = (e) => {
+    e.stopPropagation();
+    handleLike();
+  };
 
   return (
     <div
@@ -70,13 +102,46 @@ const StoryModal = ({ story, onClose }) => {
             </svg>
             <span>{story.viewsCount ?? 0}</span>
           </div>
-          <div className={`p-1 rounded-2xl bg-gradient-to-tr ${story.gradient}`}>
-            <div className="bg-white dark:bg-gray-900 p-1 rounded-2xl">
+          <div className="absolute top-4 right-4 z-10 flex items-center gap-2 rounded-full bg-black/70 px-3 py-1 text-sm font-medium text-white">
+            <svg
+              className="w-5 h-5 text-pink-400"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path d="M12 21c-4.35-3.26-7.5-6.1-7.5-9.75A4.75 4.75 0 0 1 9.25 6.5c1.21 0 2.38.5 3.25 1.36A4.57 4.57 0 0 1 15.75 6.5 4.75 4.75 0 0 1 19.5 11.25C19.5 14.9 16.35 17.74 12 21z" />
+            </svg>
+            <span>{story.likesCount ?? 0}</span>
+          </div>
+          <div
+            className={`p-1 rounded-2xl bg-gradient-to-tr ${story.gradient}`}
+            onDoubleClick={(e) => {
+              e.stopPropagation();
+              handleLike();
+            }}
+          >
+            <div className="bg-red-600 dark:bg-gray-900 p-1 rounded-2xl relative overflow-hidden">
               <img
                 src={story.image}
                 alt={story.title}
                 className="w-full h-full object-contain max-h-[90vh] rounded-xl"
               />
+              {showHeart && (
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <svg
+                    className="w-28 h-28 text-red-500 story-heart-pop drop-shadow-[0_0_25px_rgba(239,68,68,0.75)]"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    stroke="currentColor"
+                    strokeWidth={1.5}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 21c-4.35-3.26-7.5-6.1-7.5-9.75A4.75 4.75 0 0 1 9.25 6.5c1.21 0 2.38.5 3.25 1.36A4.57 4.57 0 0 1 15.75 6.5 4.75 4.75 0 0 1 19.5 11.25C19.5 14.9 16.35 17.74 12 21z"
+                    />
+                  </svg>
+                </div>
+              )}
             </div>
           </div>
 
@@ -84,7 +149,7 @@ const StoryModal = ({ story, onClose }) => {
             <h3 className="text-white text-2xl md:text-3xl font-bold text-center mb-4">
               {story.title}
             </h3>
-            
+
             <div className="flex justify-center">
               <a
                 href={`https://t.me/multfinder_bot?start=${encodeURIComponent(story.title)}`}
@@ -106,7 +171,40 @@ const StoryModal = ({ story, onClose }) => {
             </div>
           </div>
         </div>
+        <button
+          onClick={handleButtonLike}
+          className={`absolute bottom-6 right-6 w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-transform duration-300 ${
+            liked ? "bg-pink-900 text-white scale-105" : "bg-black/60 text-white hover:bg-black/80"
+          }`}
+          aria-pressed={liked}
+          aria-label="Like story"
+        >
+          <svg
+            className={`w-7 h-7 ${liked ? "fill-current" : ""}`}
+            viewBox="0 0 24 24"
+            fill={liked ? "currentColor" : "none"}
+            stroke="currentColor"
+            strokeWidth={1.8}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 21c-4.35-3.26-7.5-6.1-7.5-9.75A4.75 4.75 0 0 1 9.25 6.5c1.21 0 2.38.5 3.25 1.36A4.57 4.57 0 0 1 15.75 6.5 4.75 4.75 0 0 1 19.5 11.25C19.5 14.9 16.35 17.74 12 21z"
+            />
+          </svg>
+        </button>
       </div>
+      <style>{`
+        @keyframes story-heart-pop {
+          0% { transform: scale(0.2); opacity: 0; }
+          40% { transform: scale(1.1); opacity: 1; }
+          70% { transform: scale(0.95); opacity: 1; }
+          100% { transform: scale(1); opacity: 0; }
+        }
+        .story-heart-pop {
+          animation: story-heart-pop 0.65s ease forwards;
+        }
+      `}</style>
     </div>
   );
 };

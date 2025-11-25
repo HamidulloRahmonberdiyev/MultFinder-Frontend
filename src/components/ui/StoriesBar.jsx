@@ -8,7 +8,7 @@ const StoriesBar = ({ value }) => {
   const [selectedStory, setSelectedStory] = useState(null);
   const { scrollContainerRef, dragHandlers } = useDragScroll();
   const { showLeftArrow, showRightArrow, scroll } = useScrollNavigation(scrollContainerRef);
-  const { stories, loading, error, hasStories, incrementViews } = useStories();
+  const { stories, loading, error, hasStories, incrementViews, likeStory, isStoryLiked } = useStories();
   const placeholders = useMemo(() => Array.from({ length: 6 }), []);
 
   const handleOpen = (story) => {
@@ -20,7 +20,10 @@ const StoriesBar = ({ value }) => {
   useEffect(() => {
     if (!selectedStory) return;
     const latest = stories.find((story) => story.id === selectedStory.id);
-    if (latest && latest.viewsCount !== selectedStory.viewsCount) {
+    if (
+      latest &&
+      (latest.viewsCount !== selectedStory.viewsCount || latest.likesCount !== selectedStory.likesCount)
+    ) {
       setSelectedStory(latest);
     }
   }, [stories, selectedStory]);
@@ -153,7 +156,14 @@ const StoriesBar = ({ value }) => {
         )}
       </div>
 
-      {selectedStory && <StoryModal story={selectedStory} onClose={handleClose} />}
+      {selectedStory && (
+        <StoryModal
+          story={selectedStory}
+          onClose={handleClose}
+          onLike={likeStory}
+          isLiked={isStoryLiked}
+        />
+      )}
     </>
   );
 };

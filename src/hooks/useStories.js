@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 const API_URL = "https://apimultifinder.unicrm.org/api/stories";
-const INCREMENT_URL = "https://apimultifinder.unicrm.org/api/stories/increment-views";
+const INCREMENT_VIEWS_URL = "https://apimultifinder.unicrm.org/api/stories/increment-views";
+const INCREMENT_LIKES_URL = "https://apimultifinder.unicrm.org/api/stories/increment-likes";
+const LIKES_STORAGE_KEY = "multfinder_story_likes";
 const GRADIENTS = [
   "from-[#FF0080] to-[#FF8C00]",
   "from-[#8A2387] to-[#E94057]",
@@ -13,6 +15,15 @@ const GRADIENTS = [
 
 const useStories = () => {
   const [stories, setStories] = useState([]);
+  const [likedStoryIds, setLikedStoryIds] = useState(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const saved = JSON.parse(window.localStorage.getItem(LIKES_STORAGE_KEY) || "[]");
+      return Array.isArray(saved) ? saved : [];
+    } catch {
+      return [];
+    }
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -35,6 +46,7 @@ const useStories = () => {
             image: story.imageUrl,
             gradient: GRADIENTS[index % GRADIENTS.length],
             viewsCount: story.viewsCount ?? 0,
+            likesCount: story.likes ?? 0,
             createdAt: story.createdAt,
             updatedAt: story.updatedAt,
           }))
@@ -57,7 +69,7 @@ const useStories = () => {
     const formData = new FormData();
     formData.append("story_id", storyId);
     try {
-      await fetch(INCREMENT_URL, { method: "POST", body: formData });
+      await fetch(INCREMENT_VIEWS_URL, { method: "POST", body: formData });
       setStories((prev) =>
         prev.map((story) =>
           story.id === storyId ? { ...story, viewsCount: (story.viewsCount ?? 0) + 1 } : story
@@ -68,7 +80,51 @@ const useStories = () => {
     }
   };
 
-  return { stories, loading, error, hasStories, incrementViews };
+  const likeStory = async (storyId) => {
+    if (!storyId) return;
+
+    let alreadyLiked = false;
+    setLikedStoryIds((prev) => {
+      if (prev.includes(storyId)) {
+        alreadyLiked = true;
+        return prev;
+      }
+      const next = [...prev, storyId];
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem(LIKES_STORAGE_KEY, JSON.stringify(next));
+      }
+      return next;
+    });
+    if (alreadyLiked) return;
+
+    try {
+      const formData = new FormData();
+      formData.append("story_id", storyId);
+      await fetch(INCREMENT_LIKES_URL, { method: "POST", body: formData });
+      setStories((prev) =>
+        prev.map((story) =>
+          story.id === storyId ? { ...story, likesCount: (story.likesCount ?? 0) + 1 } : story
+        )
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const isStoryLiked = useCallback(
+    (storyId) => likedStoryIds.includes(storyId),
+    [likedStoryIds]
+  );
+
+  return {
+    stories,
+    loading,
+    error,
+    hasStories,
+    incrementViews,
+    likeStory,
+    isStoryLiked,
+  };
 };
 
 export default useStories;
