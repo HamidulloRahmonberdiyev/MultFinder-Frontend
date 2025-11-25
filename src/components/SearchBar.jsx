@@ -1,17 +1,62 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import SearchInput from "./search/SearchInput";
 import SearchResults from "./search/SearchResults";
 import { useClickOutside } from "../hooks/useClickOutside";
-import { filterSearchResults } from "../utils/filterMovies";
-import { SEARCH_RESULTS } from "../data/movies";
 import StoriesBar from "./ui/StoriesBar";
 
 const SearchBar = ({ value, onChange }) => {
   const [isFocused, setIsFocused] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const debounceTimer = useRef(null);
   
-  const filteredResults = filterSearchResults(SEARCH_RESULTS, value);
   const resultsRef = useClickOutside(() => setShowResults(false), showResults);
+
+  useEffect(() => {
+    // Clear previous timer
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
+    }
+
+    // If search value is empty, clear results
+    if (!value.trim()) {
+      setSearchResults([]);
+      setIsLoading(false);
+      return;
+    }
+
+    // Set loading state
+    setIsLoading(true);
+
+    // Debounce API call
+    debounceTimer.current = setTimeout(async () => {
+      try {
+        const response = await fetch(
+          `https://apimultifinder.unicrm.org/api/search/films?name=${encodeURIComponent(value)}`
+        );
+        const data = await response.json();
+        
+        if (data.success && data.data) {
+          setSearchResults(data.data);
+        } else {
+          setSearchResults([]);
+        }
+      } catch (error) {
+        console.error("Search API error:", error);
+        setSearchResults([]);
+      } finally {
+        setIsLoading(false);
+      }
+    }, 300); // 300ms debounce
+
+    // Cleanup function
+    return () => {
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current);
+      }
+    };
+  }, [value]);
 
   const handleChange = (e) => {
     onChange(e);
@@ -40,7 +85,11 @@ const SearchBar = ({ value, onChange }) => {
       
       {showResults && value && (
         <div ref={resultsRef}>
-          <SearchResults results={filteredResults} onSelect={handleSelect} />
+          <SearchResults 
+            results={searchResults} 
+            onSelect={handleSelect}
+            isLoading={isLoading}
+          />
         </div>
       )}
 
