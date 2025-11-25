@@ -1,10 +1,10 @@
 import { useState } from "react";
-import SearchButtons from "./ui/SearchButtons";
 import SearchInput from "./search/SearchInput";
 import SearchResults from "./search/SearchResults";
 import { useClickOutside } from "../hooks/useClickOutside";
 import { filterSearchResults } from "../utils/filterMovies";
 import { SEARCH_RESULTS } from "../data/movies";
+import StoriesBar from "./ui/StoriesBar";
 
 const SearchBar = ({ value, onChange }) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -44,7 +44,7 @@ const SearchBar = ({ value, onChange }) => {
         </div>
       )}
 
-      {!value && <SearchButtons value={value} />}
+      {!value && <StoriesBar value={value} />}
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-const StoryModal = ({ studio, onClose }) => {
+const StoryModal = ({ story, onClose }) => {
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
@@ -48,11 +48,33 @@ const StoryModal = ({ studio, onClose }) => {
         </button>
 
         <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-          <div className={`p-1 rounded-2xl bg-gradient-to-tr ${studio.gradient}`}>
+          <div className="absolute top-4 left-4 z-10 flex items-center gap-2 rounded-full bg-black/70 px-3 py-1 text-sm font-medium text-white">
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+              />
+            </svg>
+            <span>{story.viewsCount ?? 0}</span>
+          </div>
+          <div className={`p-1 rounded-2xl bg-gradient-to-tr ${story.gradient}`}>
             <div className="bg-white dark:bg-gray-900 p-1 rounded-2xl">
               <img
-                src={studio.image}
-                alt={studio.name}
+                src={story.image}
+                alt={story.title}
                 className="w-full h-full object-contain max-h-[90vh] rounded-xl"
               />
             </div>
@@ -60,12 +82,12 @@ const StoryModal = ({ studio, onClose }) => {
 
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6 rounded-b-2xl">
             <h3 className="text-white text-2xl md:text-3xl font-bold text-center mb-4">
-              {studio.name}
+              {story.title}
             </h3>
             
             <div className="flex justify-center">
               <a
-                href={`https://t.me/multfinder_bot?start=${encodeURIComponent(studio.name)}`}
+                href={`https://t.me/multfinder_bot?start=${encodeURIComponent(story.title)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2.5 bg-gradient-to-r from-[#0088cc] to-[#229ED9] hover:from-[#0077b5] hover:to-[#0088cc] text-white font-semibold px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95"
