@@ -53,14 +53,13 @@ const StoriesBar = ({ value }) => {
         <div
           ref={scrollContainerRef}
           {...dragHandlers}
-          className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-4 cursor-grab active:cursor-grabbing scroll-smooth story-container"
+          className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-4 cursor-grab active:cursor-grabbing scroll-smooth story-container gap-3 sm:gap-4 md:gap-5 lg:gap-6"
           style={{
             WebkitOverflowScrolling: "touch",
             scrollbarWidth: "none",
             msOverflowStyle: "none",
             paddingLeft: "1rem",
             paddingRight: "1rem",
-            gap: "0.75rem",
           }}
         >
           {loading && !hasStories
@@ -100,36 +99,13 @@ const StoriesBar = ({ value }) => {
         <style>{`
           .story-item {
             box-sizing: border-box;
-            flex-shrink: 0 !important;
-            flex-grow: 0 !important;
+            flex: 0 0 5%;
+            max-width: 17.5%;
           }
-          .story-item {
-            width: calc((100% - 2rem - 0.75rem * 4) / 5);
-            min-width: calc((100% - 2rem - 0.75rem * 4) / 5);
-            max-width: calc((100% - 2rem - 0.75rem * 4) / 5);
-          }
-          @media (min-width: 768px) and (max-width: 1023px) {
-            .story-container {
-              padding-left: 1.5rem !important;
-              padding-right: 1.5rem !important;
-              gap: 1.5rem !important;
-            }
+          @media (min-width: 868px) {
             .story-item {
-              width: calc((100% - 3rem - 1.5rem * 4) / 5) !important;
-              min-width: calc((100% - 3rem - 1.5rem * 4) / 5) !important;
-              max-width: calc((100% - 3rem - 1.5rem * 4) / 5) !important;
-            }
-          }
-          @media (min-width: 1024px) {
-            .story-container {
-              padding-left: 2rem !important;
-              padding-right: 2rem !important;
-              gap: 2rem !important;
-            }
-            .story-item {
-              width: calc((100% - 4rem - 2rem * 5) / 6) !important;
-              min-width: calc((100% - 4rem - 2rem * 5) / 6) !important;
-              max-width: calc((100% - 4rem - 2rem * 5) / 6) !important;
+              flex: 0 0 1%;
+              max-width: 17%;
             }
           }
         `}</style>
