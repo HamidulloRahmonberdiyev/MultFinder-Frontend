@@ -66,15 +66,18 @@ const useStories = () => {
 
   const incrementViews = async (storyId) => {
     if (!storyId) return;
+
+    // UI da ko'rishlar soni har doim oshib turishi uchun optimistik yangilash
+    setStories((prev) =>
+      prev.map((story) =>
+        story.id === storyId ? { ...story, viewsCount: (story.viewsCount ?? 0) + 1 } : story
+      )
+    );
+
     const formData = new FormData();
     formData.append("story_id", storyId);
     try {
       await fetch(INCREMENT_VIEWS_URL, { method: "POST", body: formData });
-      setStories((prev) =>
-        prev.map((story) =>
-          story.id === storyId ? { ...story, viewsCount: (story.viewsCount ?? 0) + 1 } : story
-        )
-      );
     } catch (err) {
       console.error(err);
     }
