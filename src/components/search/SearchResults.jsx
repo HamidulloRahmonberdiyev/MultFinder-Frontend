@@ -1,5 +1,4 @@
-const DEFAULT_IMAGE =
-  "https://sun9-43.userapi.com/impf/6PN9XCSv_SGa_NDd_kCmdgARiyvIuTaUAWikuA/TlrEX35od1s.jpg?size=417x604&quality=96&sign=cecf70b09833a213d55e350f4d176586&type=album";
+const DEFAULT_IMAGE = "images/search_result_poster.png";
 
 const SearchResults = ({ results, onSelect, isLoading }) => {
   const handleFilmClick = (film) => {

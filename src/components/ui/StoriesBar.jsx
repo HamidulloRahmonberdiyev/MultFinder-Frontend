@@ -53,7 +53,7 @@ const StoriesBar = ({ value }) => {
         <div
           ref={scrollContainerRef}
           {...dragHandlers}
-          className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-4 cursor-grab active:cursor-grabbing scroll-smooth story-container gap-3 sm:gap-4 md:gap-5 lg:gap-6"
+          className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-4 cursor-grab active:cursor-grabbing scroll-smooth story-container gap-4 sm:gap-4 md:gap-5 lg:gap-6"
           style={{
             WebkitOverflowScrolling: "touch",
             scrollbarWidth: "none",
