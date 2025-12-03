@@ -19,7 +19,6 @@ function App() {
       <main className="flex-1 flex flex-col items-center justify-start pt-20 md:pt-32 px-4">
         <DisneyMagicalHeader />
 
-        {/* Google-ga o'xshash Search Bar */}
         <div className="w-full max-w-2xl mb-12 md:mb-16 animate-fade-in-up">
           <SearchBar
             value={search}
@@ -27,7 +26,6 @@ function App() {
           />
         </div>
 
-        {/* Multfilm rasmlari */}
         <div className="w-full animate-fade-in">
           <Gallery images={filteredImages} />
         </div>

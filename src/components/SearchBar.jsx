@@ -14,22 +14,18 @@ const SearchBar = ({ value, onChange }) => {
   const resultsRef = useClickOutside(() => setShowResults(false), showResults);
 
   useEffect(() => {
-    // Clear previous timer
     if (debounceTimer.current) {
       clearTimeout(debounceTimer.current);
     }
 
-    // If search value is empty, clear results
     if (!value.trim()) {
       setSearchResults([]);
       setIsLoading(false);
       return;
     }
 
-    // Set loading state
     setIsLoading(true);
 
-    // Debounce API call
     debounceTimer.current = setTimeout(async () => {
       try {
         const response = await fetch(
@@ -48,9 +44,8 @@ const SearchBar = ({ value, onChange }) => {
       } finally {
         setIsLoading(false);
       }
-    }, 300); // 300ms debounce
+    }, 300); 
 
-    // Cleanup function
     return () => {
       if (debounceTimer.current) {
         clearTimeout(debounceTimer.current);

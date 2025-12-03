@@ -38,7 +38,6 @@ const Gallery = ({ images }) => {
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     loading="lazy"
                     onError={(e) => {
-                      // Fallback gradient background
                       e.target.style.display = 'none';
                       e.target.parentElement.classList.add('bg-gradient-to-br', 'from-blue-200', 'to-purple-200');
                     }}

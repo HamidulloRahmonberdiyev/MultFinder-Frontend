@@ -3,6 +3,7 @@ import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 
 const DisneyMagicalHeader = () => {
   const [stars, setStars] = useState([]);
+  const [snowflakes, setSnowflakes] = useState([]);
 
   useEffect(() => {
     // Random yulduzlar yaratish
@@ -15,6 +16,17 @@ const DisneyMagicalHeader = () => {
       size: 2 + Math.random() * 4,
     }));
     setStars(newStars);
+
+    // Qor parchalari yaratish
+    const newSnowflakes = Array.from({ length: 50 }, (_, i) => ({
+      id: i,
+      left: Math.random() * 100,
+      delay: Math.random() * 5,
+      duration: 5 + Math.random() * 10,
+      size: 4 + Math.random() * 8,
+      drift: (Math.random() - 0.5) * 100,
+    }));
+    setSnowflakes(newSnowflakes);
   }, []);
 
   return (
@@ -43,6 +55,38 @@ const DisneyMagicalHeader = () => {
                 d="M12 2L14.09 8.26L20 10L14.09 11.74L12 18L9.91 11.74L4 10L9.91 8.26L12 2Z"
                 fill="currentColor"
                 className="drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]"
+              />
+            </svg>
+          </div>
+        ))}
+      </div>
+
+      {/* Qor yog'ishi effekti */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ marginTop: '-60px'}}>
+        {snowflakes.map((flake) => (
+          <div
+            key={`snow-${flake.id}`}
+            className="absolute animate-snowfall"
+            style={{
+              left: `${flake.left}%`,
+              animationDelay: `${flake.delay}s`,
+              animationDuration: `${flake.duration}s`,
+              '--drift': `${flake.drift}px`,
+            }}
+          >
+            <svg
+              width={flake.size}
+              height={flake.size}
+              viewBox="0 0 24 24"
+              fill="none"
+              className="text-white dark:text-blue-100 opacity-80"
+            >
+              <path
+                d="M12 2v20M2 12h20M5.5 5.5l13 13M18.5 5.5l-13 13M12 7l-3 5h6zM12 17l3-5H9z"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                className="drop-shadow-[0_0_4px_rgba(255,255,255,0.8)]"
               />
             </svg>
           </div>
@@ -162,6 +206,23 @@ const DisneyMagicalHeader = () => {
           }
         }
 
+        @keyframes snowfall {
+          0% {
+            transform: translateY(-100px) translateX(0) rotate(0deg);
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          90% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(100vh) translateX(var(--drift)) rotate(360deg);
+            opacity: 0;
+          }
+        }
+
         .animate-twinkle {
           animation: twinkle 3s ease-in-out infinite;
         }
@@ -180,6 +241,9 @@ const DisneyMagicalHeader = () => {
         .animate-magic {
           display: inline-block;
           animation: magic 2s ease-in-out infinite;
+        }
+        .animate-snowfall {
+          animation: snowfall linear infinite;
         }
       `}</style>
     </div>

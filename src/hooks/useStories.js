@@ -67,7 +67,6 @@ const useStories = () => {
   const incrementViews = async (storyId) => {
     if (!storyId) return;
 
-    // UI da ko'rishlar soni har doim oshib turishi uchun optimistik yangilash
     setStories((prev) =>
       prev.map((story) =>
         story.id === storyId ? { ...story, viewsCount: (story.viewsCount ?? 0) + 1 } : story
