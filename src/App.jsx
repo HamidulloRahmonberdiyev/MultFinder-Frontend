@@ -13,10 +13,10 @@ function App() {
   const filteredImages = filterMovies(MOVIES, search);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 flex flex-col transition-colors duration-300">
+    <div className="min-h-screen flex flex-col transition-colors duration-300 bg-transparent">
       <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
 
-      <main className="flex-1 flex flex-col items-center justify-start pt-20 md:pt-32 px-4">
+      <main className="flex-1 flex flex-col items-center justify-start pt-20 md:pt-32 px-4 bg-black/4 dark:bg-black/10 backdrop-blur-[4px] rounded-t-[32px] border-t border-white/10 shadow-[0_-10px_24px_rgba(0,0,0,0.18)]">
         <DisneyMagicalHeader />
 
         <div className="w-full max-w-2xl mb-12 md:mb-16 animate-fade-in-up">
