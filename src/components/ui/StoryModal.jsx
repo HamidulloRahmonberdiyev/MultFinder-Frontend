@@ -51,7 +51,7 @@ const StoryModal = ({ story, onClose, onLike, isLiked }) => {
   };
 
   return (
-    <div
+    <div style={{ marginTop: "-450%" }}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm animate-fade-in"
       onClick={onClose}
     >
