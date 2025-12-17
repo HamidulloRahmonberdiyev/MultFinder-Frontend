@@ -10,25 +10,30 @@ const CartoonCard = ({ cartoon }) => {
     return null;
   }
 
-  // Turli xil key nomlar bilan kelishi mumkin
-  const title = cartoon.title || cartoon.name || cartoon.nomi || "Nomsiz multfilm";
-  const description = cartoon.description || cartoon.desc || cartoon.tavsif || "";
-  const video_url = cartoon.video_url || cartoon.videoUrl || cartoon.video || cartoon.url || "";
-  
-  // ID yoki index orqali URL yaratish
+  const title =
+    cartoon.title || cartoon.name || cartoon.nomi || "Nomsiz multfilm";
+  const description =
+    cartoon.description || cartoon.desc || cartoon.tavsif || "";
+  const video_url =
+    cartoon.video_url || cartoon.videoUrl || cartoon.video || cartoon.url || "";
+
   const cartoonId = cartoon.id || cartoon._id || null;
   const cartoonIndex = cartoon.index !== undefined ? cartoon.index : null;
-  
+
   const handleVideoClick = () => {
     if (cartoonId || cartoonIndex !== null) {
       navigate(`/cartoons/${cartoonId || cartoonIndex}`);
     }
   };
 
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
+
   return (
     <div className="group relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-2xl overflow-hidden shadow-lg dark:shadow-gray-900/50 hover:shadow-2xl dark:hover:shadow-gray-900/70 transition-all duration-300 transform hover:-translate-y-2">
       {/* Video Container */}
-      <div 
+      <div
         className="relative w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 cursor-pointer group/video"
         onClick={handleVideoClick}
       >
@@ -97,28 +102,35 @@ const CartoonCard = ({ cartoon }) => {
           {title}
         </h3>
 
-        {/* Description */}
-        {description && (
-          <div className="mb-4">
-            {showDescription || description.length <= 150 ? (
-              <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-                {description}
-              </p>
-            ) : (
-              <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-                {description.substring(0, 150)}...
-              </p>
-            )}
-            {description.length > 150 && (
-              <button
-                onClick={() => setShowDescription(!showDescription)}
-                className="mt-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium transition-colors duration-200"
-              >
-                {showDescription ? "Kamroq ko'rsatish" : "Ko'proq ko'rsatish"}
-              </button>
-            )}
-          </div>
-        )}
+        <div className="mb-4">
+          {description && description.trim() ? (
+            <>
+              {showDescription || description.length <= 150 ? (
+                <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+                  {description}
+                </p>
+              ) : (
+                <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+                  {description.substring(0, 100)}...
+                </p>
+              )}
+              {description.length > 100 && (
+                <button
+                  onClick={() => setShowDescription(!showDescription)}
+                  className="mt-2 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium transition-colors duration-200"
+                >
+                  {showDescription ? "Kamroq ko'rsatish" : "Ko'proq ko'rsatish"}
+                </button>
+              )}
+            </>
+          ) : (
+            <p className="text-gray-500 dark:text-gray-400 text-sm italic leading-relaxed">
+              MultFinder — multfilm topishning eng qulay yo‘li MultFinder bu
+              multfilm ixlosmandlari uchun ishlab chiqilgan zamonaviy va
+              ishonchli loyiha. 
+            </p>
+          )}
+        </div>
 
         {/* Action Button */}
         {cartoonId || cartoonIndex !== null ? (
@@ -126,14 +138,14 @@ const CartoonCard = ({ cartoon }) => {
             to={`/cartoons/${cartoonId || cartoonIndex}`}
             className="block w-full mt-4 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl text-center"
           >
-            Batafsil
+            Tomosha qilish
           </Link>
         ) : (
           <button
             onClick={toggleExpand}
             className="w-full mt-4 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl"
           >
-            {isExpanded ? "Yopish" : "Batafsil"}
+            {isExpanded ? "Yopish" : "Tomosha qilish"}
           </button>
         )}
       </div>
@@ -149,16 +161,16 @@ const CartoonCard = ({ cartoon }) => {
                 </span>
                 <p className="text-gray-800 dark:text-gray-200 mt-1">{title}</p>
               </div>
-              {description && (
-                <div>
-                  <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                    Tavsif
-                  </span>
-                  <p className="text-gray-600 dark:text-gray-400 mt-1 leading-relaxed">
-                    {description}
-                  </p>
-                </div>
-              )}
+              <div>
+                <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                  Tavsif
+                </span>
+                <p className="text-gray-600 dark:text-gray-400 mt-1 leading-relaxed">
+                  {description && description.trim()
+                    ? description
+                    : "Bu multfilm haqida batafsil ma'lumot hozircha mavjud emas. Tez orada qo'shiladi."}
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -171,4 +183,3 @@ const CartoonCard = ({ cartoon }) => {
 };
 
 export default CartoonCard;
-

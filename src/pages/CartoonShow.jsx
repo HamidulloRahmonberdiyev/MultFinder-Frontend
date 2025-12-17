@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import ThemeToggle from "../components/layout/ThemeToggle";
-import { useTheme } from "../hooks/useTheme";
+import { useTheme } from "../hooks/useTheme.jsx";
+import { filmsAPI } from "../services/api";
 
 const CartoonShow = () => {
   const { id } = useParams();
@@ -13,60 +14,49 @@ const CartoonShow = () => {
 
   useEffect(() => {
     const fetchCartoon = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(`https://apimultifinder.unicrm.org/api/films/${id}`);
-        
-        if (!response.ok) {
-          if (response.status === 404) {
-            throw new Error("Multfilm topilmadi");
-          }
-          throw new Error("Ma'lumotlarni yuklashda xatolik yuz berdi");
-        }
-        
-        const data = await response.json();
-        console.log("API dan kelgan ma'lumot:", data);
-        
-        if (data.success && data.data) {
-          setCartoon(data.data);
-        } else if (data.id || data.title) {
-          setCartoon(data);
-        } else {
-          throw new Error("Ma'lumotlar formati noto'g'ri");
-        }
-        setError(null);
-      } catch (err) {
-        setError(err.message);
-        console.error("API xatosi:", err);
-      } finally {
+      if (!id) {
+        setError("ID topilmadi");
         setLoading(false);
+        return;
       }
+
+      setLoading(true);
+      const result = await filmsAPI.getFilmById(id);
+
+      if (result.success) {
+        setCartoon(result.data);
+        setError(null);
+      } else {
+        setError(result.error);
+        setCartoon(null);
+      }
+
+      setLoading(false);
     };
 
-    if (id) {
-      fetchCartoon();
-    } else {
-      setError("ID topilmadi");
-      setLoading(false);
-    }
+    fetchCartoon();
   }, [id]);
 
-  const title = cartoon?.title || cartoon?.name || cartoon?.nomi || "Nomsiz multfilm";
-  const description = cartoon?.description || cartoon?.desc || cartoon?.tavsif || "";
-  const video_url = cartoon?.video_url || cartoon?.videoUrl || cartoon?.video || cartoon?.url || "";
-  
-  // Static rating (random, lekin har bir multfilm uchun bir xil)
+  const title =
+    cartoon?.title || cartoon?.name || cartoon?.nomi || "Nomsiz multfilm";
+  const description =
+    cartoon?.description || cartoon?.desc || cartoon?.tavsif || "";
+  const video_url =
+    cartoon?.video_url ||
+    cartoon?.videoUrl ||
+    cartoon?.video ||
+    cartoon?.url ||
+    "";
+
   const getRating = (cartoonTitle) => {
-    // Title asosida "random" lekin static rating yaratish
     let hash = 0;
     for (let i = 0; i < cartoonTitle.length; i++) {
       hash = cartoonTitle.charCodeAt(i) + ((hash << 5) - hash);
     }
-    // 3.5 dan 5.0 gacha rating
     const rating = 3.5 + (Math.abs(hash) % 15) / 10;
-    return Math.round(rating * 10) / 10; // 1 decimal place
+    return Math.round(rating * 10) / 10;
   };
-  
+
   const rating = cartoon ? getRating(title) : 0;
 
   return (
@@ -131,7 +121,7 @@ const CartoonShow = () => {
                 <h1 className="text-3xl md:text-5xl font-extrabold mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
                   {title}
                 </h1>
-                
+
                 {/* Rating with Stars */}
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6">
                   <div className="flex items-center gap-1">
@@ -139,7 +129,7 @@ const CartoonShow = () => {
                       const starValue = i + 1;
                       const isFull = starValue <= Math.floor(rating);
                       const isHalf = !isFull && starValue - 0.5 <= rating;
-                      
+
                       return (
                         <div key={i} className="relative">
                           <svg
@@ -156,7 +146,10 @@ const CartoonShow = () => {
                             <path d="M12 2L15.09 8.26L22 10L15.09 11.74L12 18L8.91 11.74L2 10L8.91 8.26L12 2Z" />
                           </svg>
                           {isHalf && (
-                            <div className="absolute inset-0 overflow-hidden" style={{ width: '50%' }}>
+                            <div
+                              className="absolute inset-0 overflow-hidden"
+                              style={{ width: "50%" }}
+                            >
                               <svg
                                 className="w-7 h-7 md:w-8 md:h-8 text-yellow-400"
                                 fill="currentColor"
@@ -174,7 +167,9 @@ const CartoonShow = () => {
                     <span className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">
                       {rating.toFixed(1)}
                     </span>
-                    <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">/ 5.0</span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">
+                      / 5.0
+                    </span>
                   </div>
                 </div>
               </div>
@@ -186,8 +181,11 @@ const CartoonShow = () => {
                     <iframe
                       src={video_url}
                       className="w-full h-full border-0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                       allowFullScreen
+                      webkitallowfullscreen="true"
+                      mozallowfullscreen="true"
+                      playsInline
                     ></iframe>
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800">
@@ -236,15 +234,17 @@ const CartoonShow = () => {
                     Tavsif
                   </span>
                 </h2>
-                {description ? (
+                {description && description.trim() ? (
                   <div className="prose prose-lg dark:prose-invert max-w-none">
                     <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-base md:text-lg whitespace-pre-line">
                       {description}
                     </p>
                   </div>
                 ) : (
-                  <p className="text-gray-500 dark:text-gray-400 italic">
-                    Tavsif mavjud emas
+                  <p className="text-gray-500 dark:text-gray-400 italic leading-relaxed text-base md:text-lg">
+                    MultFinder — multfilm topishning eng qulay yo‘li MultFinder
+                    bu multfilm ixlosmandlari uchun ishlab chiqilgan zamonaviy
+                    va ishonchli loyiha.
                   </p>
                 )}
               </div>
@@ -299,4 +299,3 @@ const CartoonShow = () => {
 };
 
 export default CartoonShow;
-

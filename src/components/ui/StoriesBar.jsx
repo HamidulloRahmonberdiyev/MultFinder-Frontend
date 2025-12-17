@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { useDragScroll } from "../../hooks/useDragScroll";
-import { useScrollNavigation } from "../../hooks/useScrollNavigation";
-import useStories from "../../hooks/useStories";
+import { useDragScroll } from "../../hooks/useDragScroll.jsx";
+import { useScrollNavigation } from "../../hooks/useScrollNavigation.jsx";
+import useStories from "../../hooks/useStories.jsx";
 import StoryModal from "./StoryModal";
 
 const StoriesBar = ({ value }) => {

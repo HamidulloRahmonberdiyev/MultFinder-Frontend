@@ -1,6 +1,5 @@
 import { useState, useLayoutEffect } from "react";
 
-// Always enforce dark mode
 const getInitialTheme = () => true;
 
 export const useTheme = () => {

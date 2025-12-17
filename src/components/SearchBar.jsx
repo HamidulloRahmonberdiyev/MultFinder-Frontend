@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import SearchInput from "./search/SearchInput";
 import SearchResults from "./search/SearchResults";
-import { useClickOutside } from "../hooks/useClickOutside";
+import { useClickOutside } from "../hooks/useClickOutside.jsx";
 import StoriesBar from "./ui/StoriesBar";
+import { filmsAPI } from "../services/api";
 
 const SearchBar = ({ value, onChange }) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -27,23 +28,15 @@ const SearchBar = ({ value, onChange }) => {
     setIsLoading(true);
 
     debounceTimer.current = setTimeout(async () => {
-      try {
-        const response = await fetch(
-          `https://apimultifinder.unicrm.org/api/search/films?name=${encodeURIComponent(value)}`
-        );
-        const data = await response.json();
-        
-        if (data.success && data.data) {
-          setSearchResults(data.data);
-        } else {
-          setSearchResults([]);
-        }
-      } catch (error) {
-        console.error("Search API error:", error);
+      const result = await filmsAPI.searchFilms(value);
+      
+      if (result.success) {
+        setSearchResults(result.data);
+      } else {
         setSearchResults([]);
-      } finally {
-        setIsLoading(false);
       }
+      
+      setIsLoading(false);
     }, 300); 
 
     return () => {
